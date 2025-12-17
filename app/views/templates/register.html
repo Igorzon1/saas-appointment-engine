@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar - DentistFlow{% endblock %}
+
+{% block content %}
+    
+    <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: var(--secondary-color);">
+        <div class="card-box" style="width: 100%; max-width: 400px; margin: 0;">
+            <h2 style="font-size: 1.5rem; margin-bottom: 24px; color: var(--text-dark); text-align: center;">
+                <i class="ph ph-user-plus" style="color: var(--primary-color);"></i> Criar Conta
+            </h2>
+            
+            <form action="{{ url_for('auth.register_view') }}" method="POST">
+                
+                <div class="form-group">
+                    <label for="name" class="form-label">Nome Completo</label>
+                    <input type="text" name="name" id="name" class="form-input" placeholder="Ex: João Silva" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">E-mail</label>
+                    <input type="email" name="email" id="email" class="form-input" placeholder="seu@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Senha</label>
+                    <input type="password" name="password" id="password" class="form-input" placeholder="Mínimo 6 caracteres" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone" class="form-label">Telefone (Opcional)</label>
+                    <input type="text" name="phone" id="phone" class="form-input" placeholder="(00) 00000-0000">
+                </div>
+
+                <div class="form-group">
+                    <label for="role" class="form-label">Tipo de Conta</label>
+                    <select name="role" id="role" class="form-input" required>
+                        <option value="patient">Paciente</option>
+                        <option value="professional">Profissional</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-primary btn-block">
+                    Registrar
+                </button>
+            </form>
+
+            <p style="text-align: center; margin-top: 16px; color: var(--text-gray);">
+                Já tem conta? <a href="{{ url_for('auth.login_view') }}" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">Faça login</a>
+            </p>
+        </div>
+    </div>
+
+{% endblock %}

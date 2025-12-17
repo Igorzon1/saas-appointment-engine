@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Login - DentistFlow{% endblock %}
+
+{% block content %}
+    
+    <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: var(--secondary-color);">
+        <div class="card-box" style="width: 100%; max-width: 400px; margin: 0;">
+            <h2 style="font-size: 1.5rem; margin-bottom: 24px; color: var(--text-dark); text-align: center;">
+                <i class="ph ph-sign-in" style="color: var(--primary-color);"></i> Login
+            </h2>
+            
+            <form action="{{ url_for('auth.login_view') }}" method="POST">
+                
+                <div class="form-group">
+                    <label for="email" class="form-label">E-mail</label>
+                    <input type="email" name="email" id="email" class="form-input" placeholder="seu@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Senha</label>
+                    <input type="password" name="password" id="password" class="form-input" placeholder="Sua senha" required>
+                </div>
+
+                <button type="submit" class="btn-primary btn-block">
+                    Entrar
+                </button>
+            </form>
+
+            <p style="text-align: center; margin-top: 16px; color: var(--text-gray);">
+                Não tem conta? <a href="{{ url_for('auth.register_view') }}" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">Registre-se aqui</a>
+            </p>
+        </div>
+    </div>
+
+{% endblock %}

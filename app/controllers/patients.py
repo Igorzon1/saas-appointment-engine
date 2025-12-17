@@ -1,5 +1,4 @@
 from flask import Blueprint, request, render_template, redirect, url_for
-from ..models import Patient, db
 
 bp = Blueprint("patients", __name__, template_folder="../views/templates")
 
