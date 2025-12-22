@@ -26,6 +26,7 @@ def create_app():
     app.register_blueprint(dashboard_bp, url_prefix="/")
     app.register_blueprint(patients_bp, url_prefix="/patients")
     app.register_blueprint(auth_bp, url_prefix="/auth")
+    
 
     @app.route("/health")
     def health():

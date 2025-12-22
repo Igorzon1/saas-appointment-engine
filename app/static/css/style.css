@@ -225,3 +225,88 @@ tr:last-child td { border-bottom: none; }
     justify-content: center;
     margin-top: 10px;
 }
+
+/* 1. Definições de Cores e Variáveis */
+:root {
+    --primary-blue: #137fec;
+    --dark-sidebar: #0e2a47;
+    --bg-light: #f6f7f8;
+    --text-main: #111418;
+    --text-muted: #617589;
+    --border-color: #dbe0e6;
+}
+
+/* 2. Fontes e Reset */
+body {
+    font-family: 'Manrope', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* 3. Ajuste dos Ícones Material Symbols */
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    vertical-align: middle;
+}
+
+/* 4. Estilização dos Inputs (Foco e Bordas) */
+input, select {
+    transition: all 0.2s ease-in-out !important;
+}
+
+input:focus, select:focus {
+    border-color: var(--primary-blue) !important;
+    box-shadow: 0 0 0 4px rgba(19, 127, 236, 0.1) !important;
+    outline: none !important;
+}
+
+/* 5. Estilização das Mensagens Flash (Alertas) */
+.flash-message {
+    animation: slideDown 0.4s ease-out;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 6. Customização da Sidebar (Efeito de Vidro) */
+.feature-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    transition: transform 0.2s, background 0.2s;
+}
+
+.feature-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+}
+
+/* 7. Botão do Google (Efeito Hover) */
+.btn-google {
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-google:hover {
+    background-color: #f9fafb;
+    border-color: #ced4da;
+}
+
+/* 8. Responsividade para Mobile */
+@media (max-width: 1024px) {
+    .auth-sidebar {
+        display: none; /* Esconde a barra lateral em ecrãs pequenos */
+    }
+}
+
+/* 9. Botão de Mostrar Senha (Olho) */
+.toggle-password-btn {
+    color: var(--text-muted);
+    transition: color 0.2s;
+}
+
+.toggle-password-btn:hover {
+    color: var(--primary-blue);
+}
