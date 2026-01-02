@@ -15,12 +15,14 @@ def create_app():
         SECRET_KEY=SECRET_KEY,
         SQLALCHEMY_DATABASE_URI=SQLALCHEMY_DATABASE_URI,
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
-        JWT_SECRET_KEY=SECRET_KEY  # <--- 2. CONFIG NOVA (Usamos a mesma chave para facilitar)
+        JWT_SECRET_KEY=SECRET_KEY,
+        SESSION_PERMANENT=False,  # NOVO
+        SESSION_TYPE='filesystem'  # NOVO
     )
     
     init_db(app)
     
-    jwt = JWTManager(app) # <--- 3. INICIALIZAÇÃO NOVA
+    jwt = JWTManager(app)
     
     app.register_blueprint(appointments_bp, url_prefix="/appointments")
     app.register_blueprint(dashboard_bp, url_prefix="/")

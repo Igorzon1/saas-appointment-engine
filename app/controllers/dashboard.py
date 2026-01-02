@@ -1,10 +1,13 @@
 from flask import Blueprint, render_template
+from flask_jwt_extended import jwt_required
 from datetime import datetime, date, time
 from ..models import Appointment, db
+from ..services.decorators import login_required
 
 bp = Blueprint("dashboard", __name__, template_folder="../views/templates")
 
 @bp.route("/")
+@login_required  # Protege - exige login
 def index():
     # Definir o início e o fim do dia de hoje para filtrar
     hoje = date.today()
@@ -21,7 +24,6 @@ def index():
     count_total = len(agendamentos_hoje)
     
     # Contar quantos estão "scheduled" (Na fila)
-    # Nota: Adapte a string se no seu banco você salvou diferente
     count_waiting = sum(1 for a in agendamentos_hoje if a.status == 'scheduled')
     
     # Contar quantos estão "in_service" (Em atendimento)

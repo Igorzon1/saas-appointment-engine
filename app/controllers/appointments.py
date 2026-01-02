@@ -1,15 +1,20 @@
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, request, jsonify, render_template, session
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models import Appointment, User, db
 from datetime import datetime
+from app.services.decorators import login_required
 
 appointment_bp = Blueprint('appointments', __name__, url_prefix='/appointments')
 
 @appointment_bp.route('/', methods=['POST'])
-@jwt_required() # <--- Exige que o usuário esteja logado (tenha Token)
+@login_required  # Protege - exige login
 def create_appointment():
+    # Pega o ID do token da sessão
+    if 'user' not in session:
+        return jsonify({"error": "Não autenticado"}), 401
+    
+    current_user_id = session['user']['id']
     data = request.get_json()
-    current_user_id = get_jwt_identity() # Pega o ID do Paciente do Token automaticamente
     
     # 1. Validar Dados
     if 'professional_id' not in data or 'date' not in data:
@@ -26,8 +31,8 @@ def create_appointment():
             service_type=data.get('service_type', 'Consulta Geral'),
             start_at=datetime.strptime(data['date'], '%Y-%m-%d %H:%M'),
             status='scheduled',
-            professional_id=professional.id, # ID vindo do JSON (Link do dentista)
-            patient_id=current_user_id       # ID vindo do Token (Quem está logado)
+            professional_id=professional.id,
+            patient_id=current_user_id
         )
         
         db.session.add(new_appointment)
@@ -42,6 +47,7 @@ def create_appointment():
         return jsonify({"error": str(e)}), 500
     
 @appointment_bp.route('/list', methods=['GET'])
+@login_required  # Protege - exige login
 def list_view():
     # Busca todos os agendamentos para mostrar na lista
     appointments = Appointment.query.all()
