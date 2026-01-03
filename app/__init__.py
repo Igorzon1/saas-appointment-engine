@@ -1,7 +1,8 @@
 from flask import Flask
 from flask_jwt_extended import JWTManager 
-from .db import init_db
+from .db import init_db, db
 from .config import SECRET_KEY, SQLALCHEMY_DATABASE_URI
+from flask_migrate import Migrate
 
 from .controllers.appointments import appointment_bp as appointments_bp
 from .controllers.auth import auth_bp as auth_bp
@@ -23,6 +24,8 @@ def create_app():
     init_db(app)
     
     jwt = JWTManager(app)
+    # Initialize Flask-Migrate
+    migrate = Migrate(app, db)
     
     app.register_blueprint(appointments_bp, url_prefix="/appointments")
     app.register_blueprint(dashboard_bp, url_prefix="/")

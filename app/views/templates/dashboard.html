@@ -75,7 +75,7 @@
                 <tbody>
                     {% for agendamento in agendamentos %}
                     <tr>
-                        <td style="font-weight: 500;">{{ agendamento.name }}</td>
+                        <td style="font-weight: 500;">{{ agendamento.patient_user.name if agendamento.patient_user else '-' }}</td>
                         <td>{{ agendamento.start_at.strftime('%H:%M') }}</td>
                         <td>{{ agendamento.service_type }}</td>
                         <td>
@@ -97,6 +97,33 @@
                     {% endfor %}
                 </tbody>
             </table>
+        </section>
+
+        <section class="clients-section" style="margin-top: 28px;">
+            <div class="section-header">
+                <h2>Clientes Recentes</h2>
+                <a href="{{ url_for('patients.index') }}" class="btn-primary">
+                    <i class="ph ph-users"></i> Ver Todos
+                </a>
+            </div>
+
+            <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;">
+                {% for p in recent_patients %}
+                <div class="card-box" style="flex: 1 1 180px; min-width: 180px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div style="font-weight:600;">{{ p.name }}</div>
+                            <div style="color:var(--text-gray); font-size:0.9rem;">{{ p.phone or '-' }}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <a href="{{ url_for('patients.edit', patient_id=p.id) }}" class="action-btn" title="Editar"><i class="ph ph-pencil-simple"></i></a>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div style="color:var(--text-gray);">Nenhum cliente recente.</div>
+                {% endfor %}
+            </div>
         </section>
 
     </main>

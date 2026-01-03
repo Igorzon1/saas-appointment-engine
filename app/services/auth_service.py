@@ -1,4 +1,4 @@
-from app.models import User
+from app.models.user_models import User
 from app.db import db
 from flask_jwt_extended import create_access_token
 

@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify, render_template, session
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.models import Appointment, User, db
+from app.models.appointment_models import Appointment
+from app.models.user_models import User
+from app.db import db
 from datetime import datetime
 from app.services.decorators import login_required
 

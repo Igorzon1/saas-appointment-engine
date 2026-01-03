@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Paciente - DentistFlow{% endblock %}
+
+{% block content %}
+    <div class="header">
+        <div>
+            <h1>Editar Paciente</h1>
+            <p style="color: var(--text-gray);">Atualize os dados do paciente.</p>
+        </div>
+    </div>
+
+    <div class="card-box" style="max-width: 700px; margin: 20px auto;">
+        <form action="{{ url_for('patients.update', patient_id=patient.id) }}" method="POST">
+            <div class="form-group">
+                <label for="name" class="form-label">Nome Completo</label>
+                <input type="text" name="name" id="name" class="form-input" required value="{{ patient.name }}">
+            </div>
+
+            <div class="form-group">
+                <label for="phone" class="form-label">Telefone / WhatsApp</label>
+                <input type="text" name="phone" id="phone" class="form-input" value="{{ patient.phone }}">
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="form-label">E-mail</label>
+                <input type="email" name="email" id="email" class="form-input" value="{{ patient.email }}">
+            </div>
+
+            <div class="form-group">
+                <label for="cpf" class="form-label">CPF (Opcional)</label>
+                <input type="text" name="cpf" id="cpf" class="form-input" value="{{ patient.cpf }}">
+            </div>
+
+            <div style="display:flex; gap:8px;">
+                <button type="submit" class="btn-primary">Salvar Alterações</button>
+                <a href="{{ url_for('patients.index') }}" class="btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}

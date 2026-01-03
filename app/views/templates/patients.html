@@ -77,8 +77,13 @@
                         <td>{{ patient.phone or "-" }}</td>
                         <td style="color: var(--text-gray); font-size: 0.9rem;">{{ patient.email or "-" }}</td>
                         <td>
-                            <button class="action-btn" title="Histórico"><i class="ph ph-clock-counter-clockwise"></i></button>
-                            <button class="action-btn" title="Editar"><i class="ph ph-pencil-simple"></i></button>
+                            <a href="#" class="action-btn" title="Histórico"><i class="ph ph-clock-counter-clockwise"></i></a>
+                            <a href="{{ url_for('patients.edit', patient_id=patient.id) }}" class="action-btn" title="Editar"><i class="ph ph-pencil-simple"></i></a>
+                            <form action="{{ url_for('patients.delete', patient_id=patient.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="action-btn" title="Excluir" onclick="return confirm('Deseja realmente excluir este paciente?');">
+                                    <i class="ph ph-trash"></i>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                     {% else %}
