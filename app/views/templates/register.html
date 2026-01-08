@@ -1,156 +1,69 @@
+{% extends "base.html" %}
 
+{% block title %}Cadastro - DentistFlow{% endblock %}
 
 {% block content %}
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-
-<style>
-    body { font-family: 'Manrope', sans-serif; }
-    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+<div style="max-width: 400px; margin: 50px auto; padding: 30px; border: 1px solid #e1e1e1; border-radius: 10px; background: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
     
-    /* Estilo para os cards da lateral (Efeito Vidro) */
-    .feature-card {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(8px);
-    }
-</style>
+    <h2 style="text-align: center; color: #333; margin-bottom: 20px;">Crie sua Conta</h2>
+    
+    {% if error %}
+        <div style="background: #fee2e2; color: #991b1b; padding: 10px; margin-bottom: 15px; border-radius: 6px; font-size: 0.9rem; text-align: center;">
+            {{ error }}
+        </div>
+    {% endif %}
 
-<div class="flex min-h-screen w-full overflow-hidden bg-[#f6f7f8]">
-    <div class="hidden lg:flex w-5/12 relative flex-col justify-between bg-[#0e2a47] p-12 text-white overflow-hidden">
-        <div class="absolute inset-0 z-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=2068&auto=format&fit=crop')] bg-cover bg-center"></div>
-        <div class="absolute inset-0 z-0 bg-gradient-to-b from-[#0e2a47]/90 to-[#0e2a47]/95"></div>
+    <form action="{{ url_for('auth.register_view') }}" method="POST">
         
-        <div class="relative z-10 flex flex-col h-full justify-between">
-            <div class="flex items-center gap-3">
-                <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-[#137fec] text-white">
-                    <span class="material-symbols-outlined text-2xl">dentistry</span>
-                </div>
-                <span class="text-2xl font-bold tracking-tight">DentistFlow</span>
-            </div>
-
-            <div class="flex flex-col gap-8 my-auto">
-                <div>
-                    <h1 class="text-4xl font-bold leading-tight mb-4 tracking-tight">Comece sua <br><span class="text-[#137fec]">jornada.</span></h1>
-                    <p class="text-blue-100 text-lg opacity-90 max-w-md">A plataforma completa para transformar a gestão da sua clínica odontológica.</p>
-                </div>
-
-                <div class="flex flex-col gap-4">
-                    <div class="flex items-center gap-4 p-4 rounded-xl feature-card">
-                        <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-[#137fec]/20 text-white">
-                            <span class="material-symbols-outlined">calendar_month</span>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-lg leading-snug">Agenda Inteligente</h3>
-                            <p class="text-sm text-blue-100/70">Gerencie horários com facilidade e reduza faltas.</p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-4 p-4 rounded-xl feature-card">
-                        <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-[#137fec]/20 text-white">
-                            <span class="material-symbols-outlined">folder_shared</span>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-lg leading-snug">Prontuário Digital</h3>
-                            <p class="text-sm text-blue-100/70">Histórico completo e seguro dos seus pacientes.</p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-4 p-4 rounded-xl feature-card">
-                        <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-[#137fec]/20 text-white">
-                            <span class="material-symbols-outlined">payments</span>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-lg leading-snug">Financeiro Integrado</h3>
-                            <p class="text-sm text-blue-100/70">Controle total do fluxo de caixa e faturamento.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="text-sm text-blue-200/60">© 2025 DentistFlow.</div>
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 500;">Nome Completo</label>
+            <input type="text" name="name" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
         </div>
-    </div>
 
-    <div class="w-full lg:w-7/12 flex flex-col items-center justify-center p-6 sm:p-12 bg-white">
-        <div class="w-full max-w-[520px] flex flex-col gap-6">
-            <div>
-                <h2 class="text-[#111418] text-[32px] font-bold leading-tight">Criar conta</h2>
-                <p class="text-[#617589] mt-2 text-base">Preencha seus dados para acessar o sistema.</p>
-            </div>
-
-            {% with messages = get_flashed_messages() %}
-              {% if messages %}
-                {% for message in messages %}
-                  <div class="p-4 bg-red-50 text-red-700 border border-red-100 rounded-lg text-sm font-medium text-center">
-                    {{ message }}
-                  </div>
-                {% endfor %}
-              {% endif %}
-            {% endwith %}
-
-            <form action="{{ url_for('auth.register_view') }}" method="POST" class="flex flex-col gap-4">
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-[#111418] font-bold text-sm">Nome completo</label>
-                    <input class="w-full rounded-lg border-[#dbe0e6] bg-white h-12 px-4 focus:ring-2 focus:ring-[#137fec]/20 focus:border-[#137fec] transition-all" 
-                           name="name" placeholder="Como você quer ser chamado?" required type="text"/>
-                </div>
-
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-[#111418] font-bold text-sm">E-mail corporativo</label>
-                    <input class="w-full rounded-lg border-[#dbe0e6] bg-white h-12 px-4 focus:ring-2 focus:ring-[#137fec]/20 focus:border-[#137fec] transition-all" 
-                           name="email" placeholder="seu@email.com" required type="email"/>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[#111418] font-bold text-sm">Telefone</label>
-                        <input class="w-full rounded-lg border-[#dbe0e6] bg-white h-12 px-4 focus:ring-2 focus:ring-[#137fec]/20 focus:border-[#137fec]" 
-                               name="phone" placeholder="(00) 00000-0000" type="text"/>
-                    </div>
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[#111418] font-bold text-sm">Tipo de perfil</label>
-                        <select name="role" class="w-full rounded-lg border-[#dbe0e6] bg-white h-12 px-4 focus:ring-2 focus:ring-[#137fec]/20 focus:border-[#137fec]">
-                            <option value="professional">Dentista / Clínica</option>
-                            <option value="patient">Paciente</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-[#111418] font-bold text-sm">Crie uma senha</label>
-                    <div class="relative">
-                        <input class="w-full rounded-lg border-[#dbe0e6] bg-white h-12 px-4 pr-12 focus:ring-2 focus:ring-[#137fec]/20 focus:border-[#137fec]" 
-                               id="reg-pass" name="password" placeholder="Mínimo 8 caracteres" required type="password"/>
-                        <button class="absolute right-4 top-1/2 -translate-y-1/2 text-[#617589]" type="button" onclick="toggleRegPassword()">
-                            <span class="material-symbols-outlined text-[20px]" id="reg-pass-icon">visibility_off</span>
-                        </button>
-                    </div>
-                </div>
-
-                <button type="submit" class="mt-2 w-full h-12 bg-[#137fec] text-white text-base font-bold rounded-lg hover:bg-[#137fec]/90 transition-all shadow-md">
-                    Criar minha conta
-                </button>
-            </form>
-
-            <p class="text-center text-[#617589]">
-                Já tem uma conta? <a class="font-bold text-[#137fec] hover:underline" href="{{ url_for('auth.login_view') }}">Entrar agora</a>
-            </p>
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 500;">Email</label>
+            <input type="email" name="email" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
         </div>
-    </div>
+
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 500;">Senha</label>
+            <input type="password" name="password" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 15px; background: #f8f9fa; padding: 10px; border-radius: 5px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 500;">Tipo de Conta</label>
+            <select name="role" id="roleSelect" onchange="toggleCrmField()" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                <option value="patient">Paciente (Quero agendar consultas)</option>
+                <option value="dentist">Dentista (Sou o profissional)</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="crmField" style="margin-bottom: 15px; display: none;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 500;">Número do Registro (CRM/CRO)</label>
+            <input type="text" name="crm" placeholder="Ex: 12345-PB" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+        </div>
+
+        <button type="submit" style="width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 5px; font-size: 1rem; cursor: pointer; font-weight: 600;">
+            Cadastrar
+        </button>
+    </form>
+    
+    <p style="text-align: center; margin-top: 20px; color: #666;">
+        Já tem conta? <a href="{{ url_for('auth.login_view') }}" style="color: #007bff; text-decoration: none;">Faça Login</a>
+    </p>
+
 </div>
 
 <script>
-    function toggleRegPassword() {
-        const input = document.getElementById('reg-pass');
-        const icon = document.getElementById('reg-pass-icon');
-        if (input.type === 'password') {
-            input.type = 'text';
-            icon.innerText = 'visibility';
+    // Função para mostrar/esconder o campo CRM
+    function toggleCrmField() {
+        const role = document.getElementById('roleSelect').value;
+        const crmDiv = document.getElementById('crmField');
+        
+        if (role === 'dentist') {
+            crmDiv.style.display = 'block';
         } else {
-            input.type = 'password';
-            icon.innerText = 'visibility_off';
+            crmDiv.style.display = 'none';
         }
     }
 </script>

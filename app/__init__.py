@@ -17,8 +17,6 @@ def create_app():
         SQLALCHEMY_DATABASE_URI=SQLALCHEMY_DATABASE_URI,
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
         JWT_SECRET_KEY=SECRET_KEY,
-        SESSION_PERMANENT=False,  # NOVO
-        SESSION_TYPE='filesystem'  # NOVO
     )
     
     init_db(app)

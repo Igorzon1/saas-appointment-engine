@@ -14,23 +14,20 @@ class User(db.Model):
     cpf = db.Column(db.String(14))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Se este usuário for um paciente, `dentist_id` aponta para o profissional que o cadastrou
+    # --- RELAÇÃO COM DENTISTA (Pode manter) ---
     dentist_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
-
-    # Relacionamento para acessar os pacientes associados a este profissional
     patients = db.relationship('User',
                                backref=db.backref('dentist', remote_side=[id]),
                                lazy='dynamic')
 
-    appointments_as_pro = db.relationship('Appointment',
-                                          foreign_keys='Appointment.professional_id',
-                                          backref='professional_user',
-                                          lazy=True)
+    # --- PERFIL PROFISSIONAL (Pode manter) ---
+    professional_profile = db.relationship('Professional', backref='user', uselist=False)
 
-    appointments_as_patient = db.relationship('Appointment',
-                                              foreign_keys='Appointment.patient_id',
-                                              backref='patient_user',
-                                              lazy=True)
+    # ------------------------------------------------------------------
+    # ❌ REMOVA O BLOCO 'appointments_as_patient' DAQUI
+    # ------------------------------------------------------------------
+    # A relação já está sendo criada no arquivo appointment_models.py
+    # através do backref lá. Se você deixar aqui, dá o erro de duplicação.
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
