@@ -8,6 +8,7 @@ from .controllers.appointments import appointment_bp as appointments_bp
 from .controllers.auth import auth_bp as auth_bp
 from .controllers.dashboard import bp as dashboard_bp
 from .controllers.patients import bp as patients_bp 
+from .controllers.schedule import bp as schedule_bp
 
 def create_app():
     app = Flask(__name__, template_folder="views/templates")
@@ -29,6 +30,7 @@ def create_app():
     app.register_blueprint(dashboard_bp, url_prefix="/")
     app.register_blueprint(patients_bp, url_prefix="/patients")
     app.register_blueprint(auth_bp, url_prefix="/auth")
+    app.register_blueprint(schedule_bp, url_prefix="/schedule")
     
 
     @app.route("/health")

@@ -1,7 +1,7 @@
 from app.models.user_models import User
 from app.models.professional import Professional
 from app.db import db
-from flask_jwt_extended import create_access_token # <--- ISSO É ESSENCIAL
+from flask_jwt_extended import create_access_token
 
 class AuthService:
     @staticmethod
@@ -12,7 +12,12 @@ class AuthService:
             name = data.get('name')
             password = data.get('password')
             role = data.get('role', 'patient')
-            crm = data.get('crm')
+            
+            # LÓGICA DE DOCUMENTO:
+            # Se for Dentista pega CRM, se for Clínica pega CNPJ
+            doc_identifier = data.get('crm')
+            if role == 'clinic':
+                doc_identifier = data.get('cnpj')
 
             if not email or not name or not password:
                 return {"error": "Nome, email e senha são obrigatórios."}, 400
@@ -26,23 +31,29 @@ class AuthService:
                 name=name,
                 email=email,
                 role=role,
-                phone=data.get('phone') # Adicionei caso venha do form
+                phone=data.get('phone')
             )
-            new_user.set_password(password) # Hash da senha
+            new_user.set_password(password)
             
             db.session.add(new_user)
             db.session.commit() # Gera o ID do user
             
-            # 4. (NOVO) Se for Dentista, cria o perfil Profissional
-            if role == 'dentist' or role == 'professional':
+            # 4. CRIAÇÃO DO PERFIL PROFISSIONAL / CLÍNICA
+            # Aceitamos 'dentist', 'clinic' ou 'professional'
+            if role in ['dentist', 'clinic', 'professional']:
+                
+                # Define cor: Azul para dentista, Verde para clínica
+                agenda_color = "#28a745" if role == 'clinic' else "#007bff"
+                
                 new_pro = Professional(
                     user_id=new_user.id,
-                    crm=crm,
-                    color="#007bff" # Cor padrão
+                    crm=doc_identifier, # Salva CRM ou CNPJ aqui
+                    color=agenda_color
                 )
                 db.session.add(new_pro)
                 db.session.commit()
             
+            # O to_dict aqui já vai retornar tudo integrado graças à mudança no Model
             return {"message": "Usuário criado com sucesso", "user": new_user.to_dict()}, 201
 
         except Exception as e:
@@ -65,8 +76,7 @@ class AuthService:
             if not user or not user.check_password(password):
                 return {"error": "Email ou senha incorretos."}, 401
                 
-            # 3. Gera Token REAL (Isso estava faltando na versão anterior)
-            # O identity deve ser String para evitar erros em alguns parsers JSON
+            # 3. Gera Token REAL
             access_token = create_access_token(
                 identity=str(user.id), 
                 additional_claims={"role": user.role}
@@ -74,8 +84,9 @@ class AuthService:
             
             return {
                 "message": "Login realizado com sucesso",
-                "access_token": access_token, # Token JWT válido
-                "user": user.to_dict()
+                "access_token": access_token,
+                # O to_dict() aqui retorna {id, name, role, professional: {id, crm, color}}
+                "user": user.to_dict() 
             }, 200
 
         except Exception as e:

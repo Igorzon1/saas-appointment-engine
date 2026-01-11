@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Configurar Agenda{% endblock %}
+
+{% block content %}
+<div class="card-box" style="max-width: 800px; margin: 20px auto;">
+    <h2><i class="ph ph-calendar-gear"></i> Configurar Horários de Atendimento</h2>
+    <p class="text-muted">Defina abaixo os dias e horários que você atende na clínica.</p>
+
+    <form action="{{ url_for('schedule.update_settings') }}" method="POST">
+        
+        <div class="form-group" style="margin-bottom: 30px; padding: 15px; background: #f9f9f9; border-radius: 8px;">
+            <label style="font-weight: bold;">Cor na Agenda:</label>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="color" name="color" value="{{ pro.color }}" style="height: 40px; width: 60px; border: none; cursor: pointer;">
+                <span style="font-size: 0.9em; color: #666;">Essa cor será usada para identificar seus agendamentos.</span>
+            </div>
+        </div>
+
+        <table class="table" id="scheduleTable">
+            <thead>
+                <tr>
+                    <th>Dia da Semana</th>
+                    <th>Início</th>
+                    <th>Fim</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody id="scheduleBody">
+                {% for item in schedules %}
+                <tr class="schedule-row">
+                    <td>
+                        <select name="days[]" class="form-input" required>
+                            <option value="1" {% if item.day_of_week == 1 %}selected{% endif %}>Segunda-feira</option>
+                            <option value="2" {% if item.day_of_week == 2 %}selected{% endif %}>Terça-feira</option>
+                            <option value="3" {% if item.day_of_week == 3 %}selected{% endif %}>Quarta-feira</option>
+                            <option value="4" {% if item.day_of_week == 4 %}selected{% endif %}>Quinta-feira</option>
+                            <option value="5" {% if item.day_of_week == 5 %}selected{% endif %}>Sexta-feira</option>
+                            <option value="6" {% if item.day_of_week == 6 %}selected{% endif %}>Sábado</option>
+                            <option value="0" {% if item.day_of_week == 0 %}selected{% endif %}>Domingo</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="time" name="starts[]" class="form-input" value="{{ item.start_time.strftime('%H:%M') }}" required>
+                    </td>
+                    <td>
+                        <input type="time" name="ends[]" class="form-input" value="{{ item.end_time.strftime('%H:%M') }}" required>
+                    </td>
+                    <td>
+                        <button type="button" class="btn-danger" onclick="removeRow(this)" style="padding: 5px 10px;">
+                            <i class="ph ph-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="margin-top: 15px; display: flex; gap: 10px;">
+            <button type="button" class="btn-secondary" onclick="addEmptyRow()">
+                <i class="ph ph-plus"></i> Adicionar Horário
+            </button>
+            <button type="submit" class="btn-primary" style="flex: 1;">
+                Salvar Alterações
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function addEmptyRow() {
+        const tbody = document.getElementById('scheduleBody');
+        const row = document.createElement('tr');
+        row.className = 'schedule-row';
+        
+        row.innerHTML = `
+            <td>
+                <select name="days[]" class="form-input" required>
+                    <option value="1">Segunda-feira</option>
+                    <option value="2">Terça-feira</option>
+                    <option value="3">Quarta-feira</option>
+                    <option value="4">Quinta-feira</option>
+                    <option value="5">Sexta-feira</option>
+                    <option value="6">Sábado</option>
+                    <option value="0">Domingo</option>
+                </select>
+            </td>
+            <td><input type="time" name="starts[]" class="form-input" required></td>
+            <td><input type="time" name="ends[]" class="form-input" required></td>
+            <td>
+                <button type="button" class="btn-danger" onclick="removeRow(this)" style="padding: 5px 10px;">
+                    <i class="ph ph-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    }
+
+    function removeRow(btn) {
+        const row = btn.closest('tr');
+        row.remove();
+    }
+</script>
+{% endblock %}

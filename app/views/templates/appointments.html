@@ -1,160 +1,209 @@
 {% extends "base.html" %}
 
-{% block title %}Agenda - DentistFlow{% endblock %}
+{% block title %}Agenda Inteligente{% endblock %}
 
 {% block content %}
-    
-    <div class="header">
-        <h1>Gerenciar Agenda</h1>
-    </div>
+<style>
+    /* Estilo simples para a Grade de Horários */
+    .slots-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 10px;
+        margin-top: 15px;
+    }
+    .time-slot {
+        padding: 10px;
+        background: #fff;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        cursor: pointer;
+        text-align: center;
+        font-weight: 500;
+        transition: 0.2s;
+    }
+    .time-slot:hover {
+        border-color: #007bff;
+        color: #007bff;
+    }
+    .time-slot.selected {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+    .time-slot.disabled {
+        background-color: #eee;
+        color: #aaa;
+        cursor: not-allowed;
+    }
+</style>
 
-    <div class="split-layout">
-        
-        <div class="card-box">
-            <h2 style="margin-bottom: 20px;">
-                <i class="ph ph-plus-circle"></i> Novo Agendamento
-            </h2>
+<div class="split-layout">
+    
+    <div class="card-box">
+        <h2>Novo Agendamento</h2>
+
+        <form id="appointmentForm" onsubmit="saveAppointment(event)">
             
             <div style="margin-bottom: 15px; display: flex; gap: 10px;">
-                <label>
-                    <input type="radio" name="patient_type" value="registered" checked onclick="togglePatientMode()"> 
-                    Cadastrado
-                </label>
-                <label>
-                    <input type="radio" name="patient_type" value="guest" onclick="togglePatientMode()"> 
-                    Novo/Avulso
-                </label>
+                <label><input type="radio" name="patient_type" value="registered" checked onclick="togglePatientMode()"> Cadastrado</label>
+                <label><input type="radio" name="patient_type" value="guest" onclick="togglePatientMode()"> Avulso</label>
             </div>
 
-            <form id="appointmentForm" onsubmit="saveAppointment(event)">
-                
-                <div class="form-group" id="registered_input_group">
-                    <label class="form-label">Selecione o Paciente</label>
-                    <select id="patient_id" class="form-input">
-                        <option value="">-- Buscar Paciente --</option>
-                        {% for p in patients %}
-                            <option value="{{ p.id }}">{{ p.name }} (CPF: {{ p.cpf }})</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="form-group" id="guest_input_group" style="display: none;">
-                    <label class="form-label">Nome Completo</label>
-                    <input type="text" id="guest_name" class="form-input" placeholder="Nome do paciente">
-                    
-                    <label class="form-label" style="margin-top:10px">Telefone</label>
-                    <input type="text" id="guest_phone" class="form-input" placeholder="(00) 00000-0000">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Procedimento / Serviço</label>
-                    <input type="text" id="service_desc" class="form-input" placeholder="Ex: Limpeza, Canal, Consulta..." required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Profissional Responsável</label>
-                    <input type="text" class="form-input" 
-                           value="{{ current_pro.user.name if current_pro else 'Erro: Usuário não é Pro' }}" 
-                           disabled style="background-color: #eee; color: #555;">
-                    
-                    <input type="hidden" id="professional_id" value="{{ current_pro.user.id if current_pro else '' }}">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Data e Horário</label>
-                    <input type="datetime-local" id="start_at" class="form-input" required>
-                </div>
-
-                <button type="submit" class="btn-primary btn-block">Confirmar Agendamento</button>
-            </form>
-        </div>
-
-        <div class="card-box" style="flex: 1;">
-            <div class="section-header">
-                <h2>Agendamentos</h2>
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Paciente</th>
-                        <th>Procedimento</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for appt in appointments %}
-                    <tr>
-                        <td style="font-weight: 500;">{{ appt.start_at.strftime('%d/%m %H:%M') }}</td>
-                        <td>
-                            {% if appt.patient_user %}
-                                <i class="ph ph-user"></i> {{ appt.patient_user.name }}
-                            {% else %}
-                                <i class="ph ph-user-plus"></i> {{ appt.guest_name }}
-                            {% endif %}
-                        </td>
-                        <td>{{ appt.service_description }}</td>
-                        <td><span class="status-badge">{{ appt.status }}</span></td>
-                    </tr>
-                    {% else %}
-                    <tr><td colspan="4" style="text-align:center; padding:20px;">Nenhum agendamento.</td></tr>
+            <div class="form-group" id="registered_input_group">
+                <select id="patient_id" class="form-input">
+                    <option value="">-- Buscar Paciente --</option>
+                    {% for p in patients %}
+                        <option value="{{ p.id }}">{{ p.name }}</option>
                     {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                </select>
+            </div>
+            <div class="form-group" id="guest_input_group" style="display: none;">
+                <input type="text" id="guest_name" class="form-input" placeholder="Nome">
+                <input type="text" id="guest_phone" class="form-input" placeholder="Telefone" style="margin-top: 5px;">
+            </div>
 
+            <div class="form-group">
+                <label>Serviço</label>
+                <input type="text" id="service_desc" class="form-input" placeholder="Ex: Limpeza..." required>
+            </div>
+
+            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+
+            <div class="form-group">
+                <label>1. Escolha a Data</label>
+                <input type="date" id="date_picker" class="form-input" required onchange="loadSlots()">
+            </div>
+
+            <div class="form-group">
+                <label>2. Escolha o Horário</label>
+                <div id="slots_container" class="slots-grid">
+                    <p class="text-muted" style="font-size: 0.9em;">Selecione uma data acima.</p>
+                </div>
+                <input type="hidden" id="selected_time" required>
+            </div>
+
+            <input type="hidden" id="professional_id" value="{{ current_pro.user.id }}">
+
+            <button type="submit" class="btn-primary btn-block" style="margin-top: 20px;">Confirmar</button>
+        </form>
     </div>
 
-    <script>
-        // Alterna entre Select e Inputs de Texto
-        function togglePatientMode() {
-            const isRegistered = document.querySelector('input[name="patient_type"]:checked').value === 'registered';
-            document.getElementById('registered_input_group').style.display = isRegistered ? 'block' : 'none';
-            document.getElementById('guest_input_group').style.display = isRegistered ? 'none' : 'block';
-        }
+    <div class="card-box" style="flex: 1;">
+        <h3>Agendamentos Recentes</h3>
+        <table>
+            </table>
+    </div>
+</div>
 
-        // Envia os dados para o Python
-        async function saveAppointment(event) {
-            event.preventDefault();
+<script>
+    // Função para mostrar/esconder campos de paciente/convidado
+    function togglePatientMode() {
+        const isRegistered = document.querySelector('input[name="patient_type"]:checked').value === 'registered';
+        document.getElementById('registered_input_group').style.display = isRegistered ? 'block' : 'none';
+        document.getElementById('guest_input_group').style.display = isRegistered ? 'none' : 'block';
+    }
 
-            const dateInput = document.getElementById('start_at').value;
-            if(!dateInput) { alert("Selecione uma data!"); return; }
+    // Carregar Horários Livres (Slots)
+    async function loadSlots() {
+        const dateVal = document.getElementById('date_picker').value;
+        const proId = document.getElementById('professional_id').value;
+        const container = document.getElementById('slots_container');
+        
+        if (!dateVal) return;
 
-            const payload = {
-                professional_id: document.getElementById('professional_id').value,
-                service_text: document.getElementById('service_desc').value, // <--- Pega o Texto
-                date: dateInput.replace('T', ' ')
-            };
+        container.innerHTML = '<p style="font-size:0.9em; color:#666;">Carregando horários...</p>';
 
-            const isRegistered = document.querySelector('input[name="patient_type"]:checked').value === 'registered';
-            
-            if (isRegistered) {
-                payload.patient_id = document.getElementById('patient_id').value;
-            } else {
-                payload.guest_name = document.getElementById('guest_name').value;
-                payload.guest_phone = document.getElementById('guest_phone').value;
-            }
+        try {
+            const response = await fetch(`{{ url_for('appointments.get_available_slots') }}?date=${dateVal}&professional_id=${proId}`);
+            const data = await response.json();
 
-            try {
-                const response = await fetch("{{ url_for('appointments.create') }}", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
+            container.innerHTML = ''; // Limpa
+
+            if (data.slots && data.slots.length > 0) {
+                data.slots.forEach(time => {
+                    const btn = document.createElement('div');
+                    btn.className = 'time-slot';
+                    btn.innerText = time;
+                    btn.onclick = () => selectSlot(btn, time);
+                    container.appendChild(btn);
                 });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    alert("Agendamento criado!");
-                    window.location.reload();
-                } else {
-                    alert("Erro: " + result.error);
-                }
-            } catch (error) {
-                console.error(error);
-                alert("Erro de conexão.");
+            } else {
+                container.innerHTML = '<p class="text-muted">Nenhum horário disponível (ou expediente encerrado).</p>';
             }
+        } catch (err) {
+            console.error(err);
+            container.innerHTML = '<p style="color:red">Erro ao buscar horários.</p>';
         }
-    </script>
+    }
+
+    // Selecionar visualmente o botão
+    function selectSlot(element, time) {
+        document.querySelectorAll('.time-slot').forEach(el => el.classList.remove('selected'));
+        element.classList.add('selected');
+        document.getElementById('selected_time').value = time;
+    }
+
+    // --- AQUI ESTÁ A CORREÇÃO PRINCIPAL ---
+    async function saveAppointment(event) {
+        event.preventDefault(); // Impede o formulário de recarregar sozinho antes da hora
+
+        const dateVal = document.getElementById('date_picker').value;
+        const timeVal = document.getElementById('selected_time').value;
+
+        // 1. Validação Visual
+        if(!dateVal || !timeVal) { 
+            alert("⚠️ Atenção: Você precisa selecionar uma DATA e clicar em um HORÁRIO."); 
+            return; 
+        }
+
+        // 2. Montar Data Completa
+        const fullDateStr = `${dateVal} ${timeVal}`; // Ex: "2023-10-25 08:00"
+
+        // 3. Montar Payload (Dados)
+        const payload = {
+            professional_id: document.getElementById('professional_id').value,
+            service_text: document.getElementById('service_desc').value,
+            date: fullDateStr,
+            // Pega os campos opcionais
+            patient_id: null,
+            guest_name: null,
+            guest_phone: null
+        };
+        
+        // Verifica se é Paciente Cadastrado ou Convidado
+        const isRegistered = document.querySelector('input[name="patient_type"]:checked').value === 'registered';
+        if (isRegistered) {
+            payload.patient_id = document.getElementById('patient_id').value;
+            if (!payload.patient_id) { alert("Selecione um paciente da lista!"); return; }
+        } else {
+            payload.guest_name = document.getElementById('guest_name').value;
+            payload.guest_phone = document.getElementById('guest_phone').value;
+            if (!payload.guest_name) { alert("Digite o nome do paciente convidado!"); return; }
+        }
+
+        try {
+            // 4. Enviar para o Backend
+            const response = await fetch("{{ url_for('appointments.create') }}", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            
+            const result = await response.json();
+
+            if (response.ok) {
+                // SUCESSO!
+                alert("✅ Agendamento realizado com sucesso!");
+                // OBRIGATÓRIO: Recarregar a página para atualizar a lista na direita
+                window.location.reload(); 
+            } else {
+                // ERRO DO BACKEND (Ex: Conflito de horário)
+                alert("❌ Erro: " + (result.error || "Falha desconhecida"));
+            }
+        } catch(e) { 
+            console.error(e); 
+            alert("Erro de conexão com o servidor.");
+        }
+    }
+</script>
 {% endblock %}
